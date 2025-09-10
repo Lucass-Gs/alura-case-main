@@ -1,55 +1,38 @@
 package br.com.alura.projeto.course;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.Length;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 public class NewCourseForm {
 
-    @NotBlank
+    @NotBlank(message = "Name is required")
+    @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;
 
-    @NotBlank
-    @Length(min = 4, max = 10)
+    @NotBlank(message = "Code is required")
+    @Size(min = 4, max = 10, message = "Code must be between 4 and 10 characters")
+    @Pattern(regexp = "^[a-zA-Z]+(-[a-zA-Z]+)*$", message = "Code must contain only letters and hyphens, no spaces, numbers or special characters")
     private String code;
 
-    private String description;
+    @NotBlank(message = "Instructor is required")
+    @Size(max = 100, message = "Instructor name must not exceed 100 characters")
+    private String instructor;
 
-    @NotBlank
-    @Email
-    private String instructorEmail;
+    @NotBlank(message = "Category is required")
+    @Size(max = 50, message = "Category must not exceed 50 characters")
+    private String category;
+
+    @Size(max = 500, message = "Description must not exceed 500 characters")
+    private String description;
 
     public NewCourseForm() {}
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getInstructorEmail() {
-        return instructorEmail;
-    }
-
-    public void setInstructorEmail(String instructorEmail) {
-        this.instructorEmail = instructorEmail;
+    public Course toModel() {
+        return new Course(name, code, instructor, category, description);
     }
 }

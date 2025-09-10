@@ -1,41 +1,52 @@
 package br.com.alura.projeto.course;
 
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 @Controller
 public class CourseController {
 
-    @GetMapping("/admin/courses")
-    public String list(@Valid NewCourseForm form) {
-        // TODO: Implementar a Questão 1 - Listagem de Cursos aqui...
+    private final CourseRepository courseRepository;
 
-        return "";
+    public CourseController(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
+
+    @GetMapping("/admin/courses")
+    public String list(Model model) {
+        List<CourseDTO> list = courseRepository.findAll()
+                .stream()
+                .map(CourseDTO::new)
+                .toList();
+
+        model.addAttribute("courses", list);
+
+        return "admin/course/list";
     }
 
     @GetMapping("/admin/course/new")
-    public String create(NewCourseForm form) {
-        // TODO: Implementar a Questão 1 - Cadastro de Cursos aqui...
+    public String create(NewCourseForm newCourse, Model model) { return "admin/course/newForm"; }
 
-        return "";
-    }
-
+    @Transactional
     @PostMapping("/admin/course/new")
-    public String save(@Valid NewCourseForm form) {
-        // TODO: Implementar a Questão 1 - Cadastro de Cursos aqui...
+    public String save(@Valid NewCourseForm form, BindingResult result, Model model) {
 
-        return "";
+        if (result.hasErrors()) {
+            return create(form, model);
+        }
+
+        if (courseRepository.existsByCode(form.getCode())) {
+            return create(form, model);
+        }
+
+        courseRepository.save(form.toModel());
+        return "redirect:/admin/courses";
     }
-
-    @PostMapping("/course/{code}/inactive")
-    public ResponseEntity<?> updateStatus(@PathVariable("code") String courseCode) {
-        // TODO: Implementar a Questão 2 - Inativação de Curso aqui...
-
-        return ResponseEntity.ok().build();
-    }
-
 }
