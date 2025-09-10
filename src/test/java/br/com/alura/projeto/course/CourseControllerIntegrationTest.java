@@ -1,6 +1,5 @@
 package br.com.alura.projeto.course;
 
-import br.com.alura.projeto.course.CourseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -265,5 +265,56 @@ class CourseControllerIntegrationTest {
                 .andExpect(redirectedUrl("/admin/courses"));
 
         verify(courseRepository).save(any(Course.class));
+    }
+
+    @Test
+    void shouldInactivateCourseSuccessfully() throws Exception {
+        // Given
+        Course activeCourse = new Course("Spring Boot", "spring", "João Silva", "Backend", "Spring Boot course");
+        activeCourse.setId(1L);
+        activeCourse.setStatus(CourseStatus.ACTIVE);
+        
+        when(courseRepository.findByCode("spring")).thenReturn(Optional.of(activeCourse));
+        when(courseRepository.save(any(Course.class))).thenReturn(activeCourse);
+
+        // When & Then
+        mockMvc.perform(post("/course/spring/inactive")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(courseRepository).findByCode("spring");
+        verify(courseRepository).save(any(Course.class));
+    }
+
+    @Test
+    void shouldReturnErrorWhenCourseNotFound() throws Exception {
+        when(courseRepository.findByCode("nonexistent")).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/course/nonexistent/inactive")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.field").value("code"))
+                .andExpect(jsonPath("$.message").value("Curso não encontrado"));
+
+        verify(courseRepository).findByCode("nonexistent");
+        verify(courseRepository, never()).save(any(Course.class));
+    }
+
+    @Test
+    void shouldReturnErrorWhenCourseAlreadyInactive() throws Exception {
+        Course inactiveCourse = new Course("Spring Boot", "spring", "João Silva", "Backend", "Spring Boot course");
+        inactiveCourse.setId(1L);
+        inactiveCourse.setStatus(CourseStatus.INACTIVE);
+        
+        when(courseRepository.findByCode("spring")).thenReturn(Optional.of(inactiveCourse));
+
+        mockMvc.perform(post("/course/spring/inactive")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.field").value("status"))
+                .andExpect(jsonPath("$.message").value("Curso já está inativo"));
+
+        verify(courseRepository).findByCode("spring");
+        verify(courseRepository, never()).save(any(Course.class));
     }
 }
