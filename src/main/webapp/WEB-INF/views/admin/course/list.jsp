@@ -14,6 +14,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     />
   </head>
   <body>
+    <jsp:include page="/WEB-INF/views/shared/header.jsp" />
+
     <div class="container">
       <div class="row">
         <div class="col-md-12">
