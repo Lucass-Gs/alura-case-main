@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class CategoryController {
@@ -114,6 +116,51 @@ public class CategoryController {
         }
 
         categoryRepository.save(form.toModel());
+        return "redirect:/admin/categories";
+    }
+
+    @GetMapping("/admin/category/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        Optional<Category> categoryOpt = categoryRepository.findById(id);
+        
+        if (categoryOpt.isEmpty()) {
+            return "redirect:/admin/categories";
+        }
+        
+        Category category = categoryOpt.get();
+        EditCategoryForm editForm = new EditCategoryForm(category);
+        
+        model.addAttribute("editCategoryForm", editForm);
+        model.addAttribute("categoryId", id);
+        
+        return "admin/category/editForm";
+    }
+
+    @Transactional
+    @PostMapping("/admin/category/edit/{id}")
+    public String update(@PathVariable Long id, @Valid EditCategoryForm form, BindingResult result, Model model) {
+        
+        if (result.hasErrors()) {
+            model.addAttribute("categoryId", id);
+            return "admin/category/editForm";
+        }
+        
+        Optional<Category> categoryOpt = categoryRepository.findById(id);
+        if (categoryOpt.isEmpty()) {
+            return "redirect:/admin/categories";
+        }
+        
+        Category category = categoryOpt.get();
+
+        if (!category.getCode().equals(form.getCode()) && categoryRepository.existsByCode(form.getCode())) {
+            result.rejectValue("code", "error.code", "Código já existe");
+            model.addAttribute("categoryId", id);
+            return "admin/category/editForm";
+        }
+        
+        form.updateCategory(category);
+        categoryRepository.save(category);
+        
         return "redirect:/admin/categories";
     }
 

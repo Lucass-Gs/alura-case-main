@@ -2,14 +2,11 @@ package br.com.alura.projeto.course;
 
 import br.com.alura.projeto.category.Category;
 import br.com.alura.projeto.category.CategoryRepository;
-import br.com.alura.projeto.util.ErrorItemDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -18,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -58,6 +54,8 @@ public class CourseController {
                     item.put("description", course.getDescription());
                     item.put("status", course.getStatus().toString());
                     item.put("createdAt", Date.from(course.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()));
+                    item.put("inactivationDate", course.getInactivationDate() != null ? 
+                        Date.from(course.getInactivationDate().atZone(ZoneId.systemDefault()).toInstant()) : null);
                     return item;
                 })
                 .toList();
@@ -69,11 +67,10 @@ public class CourseController {
         columns.add(createColumn("category", "Categoria", "text"));
         columns.add(createColumn("status", "Status", "status"));
         columns.add(createColumn("createdAt", "Criado em", "date"));
+        columns.add(createColumn("inactivationDate", "Desativado em", "date"));
 
         List<Map<String, Object>> actions = new ArrayList<>();
         actions.add(createAction("edit", "Editar", "/admin/course/edit/", "id"));
-        actions.add(createCustomAction("inactivate", "Inativar", "/course/", "code", "inactivate", 
-                "ACTIVE", "status", "glyphicon-ban-circle", "btn-danger"));
 
         int totalPages = coursePage.getTotalPages();
         int currentPage = page;
@@ -115,21 +112,6 @@ public class CourseController {
         return action;
     }
     
-    private Map<String, Object> createCustomAction(String type, String label, String url, String idField, 
-                                                   String actionType, String conditionValue, String conditionField, 
-                                                   String icon, String cssClass) {
-        Map<String, Object> action = new HashMap<>();
-        action.put("type", "custom");
-        action.put("label", label);
-        action.put("url", url);
-        action.put("idField", idField);
-        action.put("actionType", actionType);
-        action.put("conditionValue", conditionValue);
-        action.put("conditionField", conditionField);
-        action.put("icon", icon);
-        action.put("cssClass", cssClass);
-        return action;
-    }
 
     @GetMapping("/admin/course/new")
     public String create(NewCourseForm newCourse, Model model) {
@@ -164,27 +146,68 @@ public class CourseController {
         return "redirect:/admin/courses";
     }
 
-    @Transactional
-    @PostMapping("/course/{code}/inactive")
-    @ResponseBody
-    public ResponseEntity<?> inactivateCourse(@PathVariable String code) {
-        Optional<Course> courseOpt = courseRepository.findByCode(code);
+
+    @GetMapping("/admin/course/edit/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        Optional<Course> courseOpt = courseRepository.findById(id);
         
         if (courseOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorItemDTO("code", "Curso não encontrado"));
+            return "redirect:/admin/courses";
         }
         
         Course course = courseOpt.get();
+        EditCourseForm editForm = new EditCourseForm(course);
         
-        if (course.getStatus() == CourseStatus.INACTIVE) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorItemDTO("status", "Curso já está inativo"));
+        List<Category> categories = categoryRepository.findAll()
+                .stream()
+                .sorted((c1, c2) -> Integer.compare(c1.getOrder(), c2.getOrder()))
+                .toList();
+        
+        model.addAttribute("editCourseForm", editForm);
+        model.addAttribute("courseId", id);
+        model.addAttribute("categories", categories);
+        
+        return "admin/course/editForm";
+    }
+
+    @Transactional
+    @PostMapping("/admin/course/edit/{id}")
+    public String update(@PathVariable Long id, @Valid EditCourseForm form, BindingResult result, Model model) {
+        
+        if (result.hasErrors()) {
+            List<Category> categories = categoryRepository.findAll()
+                    .stream()
+                    .sorted((c1, c2) -> Integer.compare(c1.getOrder(), c2.getOrder()))
+                    .toList();
+            
+            model.addAttribute("categories", categories);
+            model.addAttribute("courseId", id);
+            return "admin/course/editForm";
         }
         
-        course.inactivate();
+        Optional<Course> courseOpt = courseRepository.findById(id);
+        if (courseOpt.isEmpty()) {
+            return "redirect:/admin/courses";
+        }
+        
+        Course course = courseOpt.get();
+
+        if (!course.getCode().equals(form.getCode()) && courseRepository.existsByCode(form.getCode())) {
+            result.rejectValue("code", "error.code", "Código já existe");
+            List<Category> categories = categoryRepository.findAll()
+                    .stream()
+                    .sorted((c1, c2) -> Integer.compare(c1.getOrder(), c2.getOrder()))
+                    .toList();
+            
+            model.addAttribute("categories", categories);
+            model.addAttribute("courseId", id);
+            return "admin/course/editForm";
+        }
+        
+        form.updateCourse(course);
         courseRepository.save(course);
         
-        return ResponseEntity.ok().build();
+        return "redirect:/admin/courses";
     }
+
 }
