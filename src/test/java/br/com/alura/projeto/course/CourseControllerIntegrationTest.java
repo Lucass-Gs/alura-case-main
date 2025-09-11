@@ -1,5 +1,6 @@
 package br.com.alura.projeto.course;
 
+import br.com.alura.projeto.category.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +31,9 @@ class CourseControllerIntegrationTest {
 
     @MockBean
     private CourseRepository courseRepository;
+    
+    @MockBean
+    private CategoryRepository categoryRepository;
 
     private Course course;
     private NewCourseForm validForm;
@@ -62,6 +66,8 @@ class CourseControllerIntegrationTest {
 
     @Test
     void shouldReturnNewCourseFormPage() throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+        
         mockMvc.perform(get("/admin/course/new"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/course/newForm"));
@@ -114,6 +120,8 @@ class CourseControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
     void shouldReturnFormWithValidationErrorsWhenNameIsBlank(String name) throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+        
         mockMvc.perform(post("/admin/course/new")
                 .param("name", name)
                 .param("code", validForm.getCode())
@@ -130,6 +138,8 @@ class CourseControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
     void shouldReturnFormWithValidationErrorsWhenInstructorIsBlank(String instructor) throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+        
         mockMvc.perform(post("/admin/course/new")
                 .param("name", validForm.getName())
                 .param("code", validForm.getCode())
@@ -146,6 +156,8 @@ class CourseControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
     void shouldReturnFormWithValidationErrorsWhenCategoryIsBlank(String category) throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+        
         mockMvc.perform(post("/admin/course/new")
                 .param("name", validForm.getName())
                 .param("code", validForm.getCode())
@@ -162,6 +174,8 @@ class CourseControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"123", "ab", "spring boot", "very-long-code", "spring-boot"})
     void shouldReturnFormWithValidationErrorsWhenCodeIsInvalid(String invalidCode) throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+        
         mockMvc.perform(post("/admin/course/new")
                 .param("name", validForm.getName())
                 .param("code", invalidCode)
@@ -177,6 +191,8 @@ class CourseControllerIntegrationTest {
 
     @Test
     void shouldReturnFormWithValidationErrorsWhenDescriptionIsTooLong() throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
+        
         int charMaxLimit = 501;
         String longDescription = "a".repeat(charMaxLimit);
 
@@ -195,6 +211,7 @@ class CourseControllerIntegrationTest {
     
     @Test
     void shouldReturnFormWhenCourseCodeAlreadyExists() throws Exception {
+        when(categoryRepository.findAll()).thenReturn(Collections.emptyList());
         when(courseRepository.existsByCode(validForm.getCode())).thenReturn(true);
 
         mockMvc.perform(post("/admin/course/new")
@@ -269,7 +286,6 @@ class CourseControllerIntegrationTest {
 
     @Test
     void shouldInactivateCourseSuccessfully() throws Exception {
-        // Given
         Course activeCourse = new Course("Spring Boot", "spring", "João Silva", "Backend", "Spring Boot course");
         activeCourse.setId(1L);
         activeCourse.setStatus(CourseStatus.ACTIVE);
@@ -277,7 +293,6 @@ class CourseControllerIntegrationTest {
         when(courseRepository.findByCode("spring")).thenReturn(Optional.of(activeCourse));
         when(courseRepository.save(any(Course.class))).thenReturn(activeCourse);
 
-        // When & Then
         mockMvc.perform(post("/course/spring/inactive")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

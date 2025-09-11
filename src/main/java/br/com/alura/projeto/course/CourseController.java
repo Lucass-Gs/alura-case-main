@@ -1,5 +1,7 @@
 package br.com.alura.projeto.course;
 
+import br.com.alura.projeto.category.Category;
+import br.com.alura.projeto.category.CategoryRepository;
 import br.com.alura.projeto.util.ErrorItemDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,11 @@ import java.util.Optional;
 public class CourseController {
 
     private final CourseRepository courseRepository;
+    private final CategoryRepository categoryRepository;
 
-    public CourseController(CourseRepository courseRepository) {
+    public CourseController(CourseRepository courseRepository, CategoryRepository categoryRepository) {
         this.courseRepository = courseRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping("/admin/courses")
@@ -38,14 +42,28 @@ public class CourseController {
     }
 
     @GetMapping("/admin/course/new")
-    public String create(NewCourseForm newCourse, Model model) { return "admin/course/newForm"; }
+    public String create(NewCourseForm newCourse, Model model) {
+        List<Category> categories = categoryRepository.findAll()
+                .stream()
+                .sorted((c1, c2) -> Integer.compare(c1.getOrder(), c2.getOrder()))
+                .toList();
+        
+        model.addAttribute("categories", categories);
+        return "admin/course/newForm";
+    }
 
     @Transactional
     @PostMapping("/admin/course/new")
     public String save(@Valid NewCourseForm form, BindingResult result, Model model) {
 
         if (result.hasErrors()) {
-            return create(form, model);
+            List<Category> categories = categoryRepository.findAll()
+                    .stream()
+                    .sorted((c1, c2) -> Integer.compare(c1.getOrder(), c2.getOrder()))
+                    .toList();
+            
+            model.addAttribute("categories", categories);
+            return "admin/course/newForm";
         }
 
         if (courseRepository.existsByCode(form.getCode())) {
