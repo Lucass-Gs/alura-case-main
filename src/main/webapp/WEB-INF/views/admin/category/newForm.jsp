@@ -13,69 +13,94 @@ uri="http://www.springframework.org/tags/form" %>
       type="text/css"
       href="/assets/external-libs/bootstrap/css/bootstrap.min.css"
     />
+    <link rel="stylesheet" type="text/css" href="/assets/css/forms.css" />
   </head>
   <body>
     <jsp:include page="/WEB-INF/views/shared/header.jsp" />
 
     <div class="container">
-      <section class="panel panel-primary vertical-space">
-        <div class="panel-heading">
-          <h1>Cadastrar nova categoria</h1>
+      <div class="form-container">
+        <div class="form-header">
+          <h1>Cadastrar Categoria</h1>
         </div>
 
         <form:form
           modelAttribute="newCategoryForm"
-          cssClass="form-horizontal panel-body"
+          cssClass="form-horizontal form-body"
           action="/admin/category/new"
           method="post"
         >
-          <div class="row form-group">
-            <div class="col-md-9">
-              <label for="newCategory-name">Nome:</label>
-              <form:input
-                path="name"
-                id="newCategory-name"
-                cssClass="form-control"
-                required="required"
-              />
-            </div>
-
-            <div class="col-md-9">
-              <label for="newCategory-code">Código:</label>
-              <form:input
-                path="code"
-                id="newCategory-code"
-                cssClass="form-control"
-                required="required"
-              />
-            </div>
-
-            <div class="col-md-9">
-              <label for="newCategory-color">Cor:</label>
-              <form:input
-                path="color"
-                id="newCategory-color"
-                cssClass="form-control"
-                required="required"
-              />
-            </div>
-
-            <div class="col-md-9">
-              <label for="newCategory-order">Ordem:</label>
-              <form:input
-                path="order"
-                type="number"
-                min="1"
-                id="newCategory-order"
-                cssClass="form-control"
-                required="required"
-              />
-            </div>
+          <div class="form-group">
+            <label for="newCategory-name">Nome *</label>
+            <form:input
+              path="name"
+              id="newCategory-name"
+              cssClass="form-control"
+              placeholder="Digite o nome da categoria"
+              required="required"
+            />
+            <form:errors path="name" cssClass="text-danger" />
           </div>
 
-          <input class="btn btn-success submit" type="submit" value="Salvar" />
+          <div class="form-group">
+            <label for="newCategory-code">Código *</label>
+            <form:input
+              path="code"
+              id="newCategory-code"
+              cssClass="form-control"
+              placeholder="Digite o código da categoria"
+              required="required"
+            />
+            <form:errors path="code" cssClass="text-danger" />
+            <small class="help-block"
+              >Exemplo: programacao, front-end, data-science</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="newCategory-color">Cor *</label>
+            <form:input
+              path="color"
+              id="newCategory-color"
+              cssClass="form-control"
+              placeholder="Digite a cor da categoria (ex: #FF6B6B)"
+              required="required"
+            />
+            <form:errors path="color" cssClass="text-danger" />
+            <small class="help-block"
+              >Use código hexadecimal (ex: #FF6B6B)</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="newCategory-order">Ordem *</label>
+            <form:input
+              path="order"
+              type="number"
+              min="1"
+              id="newCategory-order"
+              cssClass="form-control"
+              placeholder="Digite a ordem de exibição"
+              required="required"
+            />
+            <form:errors path="order" cssClass="text-danger" />
+            <small class="help-block">Número para ordenar as categorias</small>
+          </div>
+
+          <div class="form-actions">
+            <a
+              href="<c:url value='/admin/categories'/>"
+              class="btn btn-default"
+            >
+              <span class="glyphicon glyphicon-arrow-left"></span> Voltar à
+              Lista
+            </a>
+            <button type="submit" class="btn btn-success">
+              Salvar Categoria
+            </button>
+          </div>
         </form:form>
-      </section>
+      </div>
     </div>
   </body>
 </html>

@@ -4,6 +4,10 @@ import br.com.alura.projeto.category.Category;
 import br.com.alura.projeto.category.CategoryRepository;
 import br.com.alura.projeto.util.ErrorItemDTO;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,9 +17,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -30,15 +40,95 @@ public class CourseController {
     }
 
     @GetMapping("/admin/courses")
-    public String list(Model model) {
-        List<CourseDTO> list = courseRepository.findAll()
-                .stream()
-                .map(CourseDTO::new)
+    public String list(@RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "10") int size,
+                       Model model) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Course> coursePage = courseRepository.findAll(pageable);
+
+        List<Map<String, Object>> items = coursePage.getContent().stream()
+                .map(course -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("id", course.getId());
+                    item.put("name", course.getName());
+                    item.put("code", course.getCode());
+                    item.put("instructor", course.getInstructor());
+                    item.put("category", course.getCategory());
+                    item.put("description", course.getDescription());
+                    item.put("status", course.getStatus().toString());
+                    item.put("createdAt", Date.from(course.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()));
+                    return item;
+                })
                 .toList();
 
-        model.addAttribute("courses", list);
+        List<Map<String, Object>> columns = new ArrayList<>();
+        columns.add(createColumn("name", "Nome", "text"));
+        columns.add(createColumn("code", "Código", "text"));
+        columns.add(createColumn("instructor", "Instrutor", "text"));
+        columns.add(createColumn("category", "Categoria", "text"));
+        columns.add(createColumn("status", "Status", "status"));
+        columns.add(createColumn("createdAt", "Criado em", "date"));
+
+        List<Map<String, Object>> actions = new ArrayList<>();
+        actions.add(createAction("edit", "Editar", "/admin/course/edit/", "id"));
+        actions.add(createCustomAction("inactivate", "Inativar", "/course/", "code", "inactivate", 
+                "ACTIVE", "status", "glyphicon-ban-circle", "btn-danger"));
+
+        int totalPages = coursePage.getTotalPages();
+        int currentPage = page;
+        int startPage = Math.max(0, currentPage - 2);
+        int endPage = Math.min(totalPages - 1, currentPage + 2);
+
+        model.addAttribute("datagridTitle", "Cursos");
+        model.addAttribute("datagridNewUrl", "/admin/course/new");
+        model.addAttribute("datagridNewText", "Novo Curso");
+        model.addAttribute("datagridItems", items);
+        model.addAttribute("datagridColumns", columns);
+        model.addAttribute("datagridActions", actions);
+        model.addAttribute("datagridCurrentPage", currentPage);
+        model.addAttribute("datagridTotalPages", totalPages);
+        model.addAttribute("datagridStartPage", startPage);
+        model.addAttribute("datagridEndPage", endPage);
+        model.addAttribute("datagridItemsPerPage", size);
+        model.addAttribute("datagridTotalItems", coursePage.getTotalElements());
+        model.addAttribute("datagridStartItem", page * size + 1);
+        model.addAttribute("datagridEndItem", Math.min((long) (page + 1) * size, coursePage.getTotalElements()));
 
         return "admin/course/list";
+    }
+    
+    private Map<String, Object> createColumn(String field, String label, String type) {
+        Map<String, Object> column = new HashMap<>();
+        column.put("field", field);
+        column.put("label", label);
+        column.put("type", type);
+        return column;
+    }
+    
+    private Map<String, Object> createAction(String type, String label, String url, String idField) {
+        Map<String, Object> action = new HashMap<>();
+        action.put("type", type);
+        action.put("label", label);
+        action.put("url", url);
+        action.put("idField", idField);
+        return action;
+    }
+    
+    private Map<String, Object> createCustomAction(String type, String label, String url, String idField, 
+                                                   String actionType, String conditionValue, String conditionField, 
+                                                   String icon, String cssClass) {
+        Map<String, Object> action = new HashMap<>();
+        action.put("type", "custom");
+        action.put("label", label);
+        action.put("url", url);
+        action.put("idField", idField);
+        action.put("actionType", actionType);
+        action.put("conditionValue", conditionValue);
+        action.put("conditionField", conditionField);
+        action.put("icon", icon);
+        action.put("cssClass", cssClass);
+        return action;
     }
 
     @GetMapping("/admin/course/new")

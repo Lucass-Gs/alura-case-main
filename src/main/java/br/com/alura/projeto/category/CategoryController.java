@@ -1,14 +1,22 @@
 package br.com.alura.projeto.category;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class CategoryController {
@@ -20,15 +28,72 @@ public class CategoryController {
     }
 
     @GetMapping("/admin/categories")
-    public String list(Model model) {
-        List<CategoryDTO> list = categoryRepository.findAll()
-                .stream()
-                .map(CategoryDTO::new)
+    public String list(@RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "10") int size,
+                       Model model) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("order").ascending());
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+        List<Map<String, Object>> items = categoryPage.getContent().stream()
+                .map(category -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("id", category.getId());
+                    item.put("name", category.getName());
+                    item.put("code", category.getCode());
+                    item.put("color", category.getColor());
+                    item.put("order", category.getOrder());
+                    return item;
+                })
                 .toList();
 
-        model.addAttribute("categories", list);
+        List<Map<String, Object>> columns = new ArrayList<>();
+        columns.add(createColumn("name", "Nome", "text"));
+        columns.add(createColumn("code", "Código", "text"));
+        columns.add(createColumn("color", "Cor", "text"));
+        columns.add(createColumn("order", "Ordem", "number"));
+
+        List<Map<String, Object>> actions = new ArrayList<>();
+        actions.add(createAction("edit", "Editar", "/admin/category/edit/", "id"));
+
+        int totalPages = categoryPage.getTotalPages();
+        int currentPage = page;
+        int startPage = Math.max(0, currentPage - 2);
+        int endPage = Math.min(totalPages - 1, currentPage + 2);
+
+        model.addAttribute("datagridTitle", "Categorias");
+        model.addAttribute("datagridNewUrl", "/admin/category/new");
+        model.addAttribute("datagridNewText", "Nova Categoria");
+        model.addAttribute("datagridItems", items);
+        model.addAttribute("datagridColumns", columns);
+        model.addAttribute("datagridActions", actions);
+        model.addAttribute("datagridCurrentPage", currentPage);
+        model.addAttribute("datagridTotalPages", totalPages);
+        model.addAttribute("datagridStartPage", startPage);
+        model.addAttribute("datagridEndPage", endPage);
+        model.addAttribute("datagridItemsPerPage", size);
+        model.addAttribute("datagridTotalItems", categoryPage.getTotalElements());
+        model.addAttribute("datagridStartItem", page * size + 1);
+        model.addAttribute("datagridEndItem", Math.min((long) (page + 1) * size, categoryPage.getTotalElements()));
 
         return "admin/category/list";
+    }
+    
+    private Map<String, Object> createColumn(String field, String label, String type) {
+        Map<String, Object> column = new HashMap<>();
+        column.put("field", field);
+        column.put("label", label);
+        column.put("type", type);
+        return column;
+    }
+    
+    private Map<String, Object> createAction(String type, String label, String url, String idField) {
+        Map<String, Object> action = new HashMap<>();
+        action.put("type", type);
+        action.put("label", label);
+        action.put("url", url);
+        action.put("idField", idField);
+        return action;
     }
 
     @GetMapping("/admin/category/new")
