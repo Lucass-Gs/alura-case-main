@@ -4,29 +4,41 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "Category")
 public class Category {
 
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Setter
+    @Getter
+    @NotBlank(message = "Nome é obrigatório")
     private String name;
 
-    @NotBlank
-    @Length(min = 4, max = 10)
+    @Setter
+    @Getter
+    @NotBlank(message = "Código é obrigatório")
     private String code;
 
-    @NotBlank
+    @Setter
+    @Getter
+    @NotBlank(message = "Cor é obrigatória")
     private String color;
 
-    @NotNull
-    @Min(1)
+    @Setter
+    @Getter
+    @NotNull(message = "Ordem é obrigatória")
+    @Min(value = 1, message = "Ordem deve ser pelo menos 1")
     @Column(name = "`order`")
     private int order;
 
@@ -42,39 +54,4 @@ public class Category {
         this.order = order;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
 }
