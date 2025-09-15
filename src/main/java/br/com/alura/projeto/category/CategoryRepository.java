@@ -13,10 +13,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findAllOrderedByOrder();
     
     @Query(value = """
-        SELECT DISTINCT c.* FROM category c
-        INNER JOIN courses co ON c.name COLLATE utf8mb4_unicode_ci = co.category COLLATE utf8mb4_unicode_ci
+        SELECT DISTINCT c.id, c.code, c.color, c.createdAt, c.name, c."order" 
+        FROM category c
+        INNER JOIN courses co ON c.name = co.category
         WHERE co.status = 'ACTIVE'
-        ORDER BY c.order
+        ORDER BY c."order"
         LIMIT 9
         """, nativeQuery = true)
     List<Category> findTop9CategoriesWithActiveCourses();
