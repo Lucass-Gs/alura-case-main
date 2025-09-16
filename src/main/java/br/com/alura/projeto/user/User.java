@@ -2,10 +2,17 @@ package br.com.alura.projeto.user;
 
 import br.com.alura.projeto.util.EncryptUtil;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "\"User\"")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -21,33 +28,10 @@ public class User {
     private String email;
     private String password;
 
-    @Deprecated
-    public User() {}
-
     public User(String name, String email, Role role, String password) {
         this.name = name;
         this.role = role;
         this.email = email;
         this.password = EncryptUtil.toMD5(password);
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public String getPassword() {
-        return password;
     }
 }
