@@ -20,7 +20,7 @@ uri="http://www.springframework.org/tags/form" %>
     <div class="container">
       <div class="form-container">
         <div class="form-header">
-          <h1>Novo Curso - Alura</h1>
+          <h1>Novo Curso</h1>
         </div>
 
         <form:form

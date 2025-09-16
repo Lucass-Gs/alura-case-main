@@ -6,7 +6,7 @@ uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Editar Curso</title>
+    <title>Editar Curso - Alura</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link
       rel="stylesheet"

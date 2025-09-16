@@ -21,7 +21,7 @@ uri="http://www.springframework.org/tags/form" %>
     <div class="container">
       <div class="form-container">
         <div class="form-header">
-          <h1>Nova Categoria - Alura</h1>
+          <h1>Nova Categoria</h1>
         </div>
 
         <form:form
