@@ -46,7 +46,7 @@ class NewCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("name") && 
-                              v.getMessage().contains("não deve estar em branco")))
+                              v.getMessage().contains("Nome é obrigatório")))
                 .isTrue();
     }
 
@@ -67,7 +67,7 @@ class NewCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("code") && 
-                              v.getMessage().contains("não deve estar em branco")))
+                              v.getMessage().contains("Código é obrigatório")))
                 .isTrue();
     }
 
@@ -88,7 +88,7 @@ class NewCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("color") && 
-                              v.getMessage().contains("não deve estar em branco")))
+                              v.getMessage().contains("Cor é obrigatória")))
                 .isTrue();
     }
 
@@ -214,7 +214,7 @@ class NewCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("order") && 
-                              v.getMessage().contains("deve ser maior que ou igual à 1")))
+                              v.getMessage().contains("Ordem deve ser pelo menos 1")))
                 .isTrue();
     }
 
@@ -235,7 +235,7 @@ class NewCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("order") && 
-                              v.getMessage().contains("deve ser maior que ou igual à 1")))
+                              v.getMessage().contains("Ordem deve ser pelo menos 1")))
                 .isTrue();
     }
 

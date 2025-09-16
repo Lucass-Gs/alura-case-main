@@ -6,17 +6,17 @@ import org.hibernate.validator.constraints.Length;
 
 public class EditCategoryForm {
 
-    @NotBlank
+    @NotBlank(message = "Nome é obrigatório")
     private String name;
 
-    @NotBlank
-    @Length(min = 4, max = 10)
+    @NotBlank(message = "Código é obrigatório")
+    @Length(min = 4, max = 10, message = "Código deve ter entre 4 e 10 caracteres")
     private String code;
 
-    @Min(1)
+    @Min(value = 1, message = "Ordem deve ser pelo menos 1")
     private int order;
 
-    @NotBlank
+    @NotBlank(message = "Cor é obrigatória")
     private String color;
 
     public EditCategoryForm() {}

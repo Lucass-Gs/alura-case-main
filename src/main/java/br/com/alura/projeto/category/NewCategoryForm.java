@@ -7,18 +7,18 @@ import org.hibernate.validator.constraints.Length;
 
 public class NewCategoryForm {
 
-    @NotBlank
+    @NotBlank(message = "Nome é obrigatório")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Código é obrigatório")
     @Length(min = 4, max = 10, message = "Código deve ter entre 4 e 10 caracteres")
     @Pattern(regexp = "^[a-zA-Z]+(-[a-zA-Z]+)*$", message = "Código deve conter apenas letras e hífens, sem espaços, números ou caracteres especiais")
     private String code;
 
-    @Min(1)
+    @Min(value = 1, message = "Ordem deve ser pelo menos 1")
     private int order;
 
-    @NotBlank
+    @NotBlank(message = "Cor é obrigatória")
     private String color;
 
     public Category toModel() {

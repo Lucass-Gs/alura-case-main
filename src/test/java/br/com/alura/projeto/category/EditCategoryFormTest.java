@@ -69,7 +69,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("name") && 
-                              v.getMessage().contains("não deve estar em branco")))
+                              v.getMessage().contains("Nome é obrigatório")))
                 .isTrue();
     }
 
@@ -87,7 +87,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("code") && 
-                              v.getMessage().contains("não deve estar em branco")))
+                              v.getMessage().contains("Código é obrigatório")))
                 .isTrue();
     }
 
@@ -105,7 +105,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("color") && 
-                              v.getMessage().contains("não deve estar em branco")))
+                              v.getMessage().contains("Cor é obrigatória")))
                 .isTrue();
     }
 
@@ -123,7 +123,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("code") && 
-                              v.getMessage().contains("o comprimento deve ser entre 4 e 10")))
+                              v.getMessage().contains("Código deve ter entre 4 e 10 caracteres")))
                 .isTrue();
     }
 
@@ -141,7 +141,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("code") && 
-                              v.getMessage().contains("o comprimento deve ser entre 4 e 10")))
+                              v.getMessage().contains("Código deve ter entre 4 e 10 caracteres")))
                 .isTrue();
     }
 
@@ -201,7 +201,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("order") && 
-                              v.getMessage().contains("deve ser maior que ou igual à 1")))
+                              v.getMessage().contains("Ordem deve ser pelo menos 1")))
                 .isTrue();
     }
 
@@ -219,7 +219,7 @@ class EditCategoryFormTest {
         assertThat(violations).isNotEmpty();
         assertThat(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("order") && 
-                              v.getMessage().contains("deve ser maior que ou igual à 1")))
+                              v.getMessage().contains("Ordem deve ser pelo menos 1")))
                 .isTrue();
     }
 
