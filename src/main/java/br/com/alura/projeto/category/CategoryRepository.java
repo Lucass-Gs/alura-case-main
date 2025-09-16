@@ -12,13 +12,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT c FROM Category c ORDER BY c.order ASC")
     List<Category> findAllOrderedByOrder();
     
-    @Query(value = """
-        SELECT DISTINCT c.id, c.code, c.color, c.createdAt, c.name, c."order" 
-        FROM category c
-        INNER JOIN courses co ON c.name = co.category
+    @Query("""
+        SELECT DISTINCT c FROM Category c
+        INNER JOIN Course co ON c.name = co.category
         WHERE co.status = 'ACTIVE'
-        ORDER BY c."order"
-        LIMIT 9
-        """, nativeQuery = true)
+        ORDER BY c.order
+        """)
     List<Category> findTop9CategoriesWithActiveCourses();
 }
