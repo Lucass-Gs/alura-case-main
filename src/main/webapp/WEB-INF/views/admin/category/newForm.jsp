@@ -6,7 +6,7 @@ uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Cadastrar nova Categoria</title>
+    <title>Nova Categoria - Alura</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link
       rel="stylesheet"
@@ -21,7 +21,7 @@ uri="http://www.springframework.org/tags/form" %>
     <div class="container">
       <div class="form-container">
         <div class="form-header">
-          <h1>Cadastrar Categoria</h1>
+          <h1>Nova Categoria - Alura</h1>
         </div>
 
         <form:form

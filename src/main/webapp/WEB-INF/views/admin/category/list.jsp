@@ -5,7 +5,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Lista de Categorias</title>
+    <title>Lista de Categorias - Alura</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link
       rel="stylesheet"

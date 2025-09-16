@@ -7,7 +7,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Course Management - Alura</title>
+    <title>Lista de Cursos - Alura</title>
     <link
       href="<c:url value='/assets/external-libs/bootstrap/css/bootstrap.min.css'/>"
       rel="stylesheet"
