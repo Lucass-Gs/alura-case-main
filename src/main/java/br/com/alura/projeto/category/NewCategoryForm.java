@@ -2,6 +2,7 @@ package br.com.alura.projeto.category;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.Length;
 
 public class NewCategoryForm {
@@ -10,7 +11,8 @@ public class NewCategoryForm {
     private String name;
 
     @NotBlank
-    @Length(min = 4, max = 10)
+    @Length(min = 4, max = 10, message = "Código deve ter entre 4 e 10 caracteres")
+    @Pattern(regexp = "^[a-zA-Z]+(-[a-zA-Z]+)*$", message = "Código deve conter apenas letras e hífens, sem espaços, números ou caracteres especiais")
     private String code;
 
     @Min(1)
