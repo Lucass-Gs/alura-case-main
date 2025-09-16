@@ -1,7 +1,12 @@
 package br.com.alura.projeto.user;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
 public class UserListItemDTO implements Serializable {
 
     private String name;
@@ -12,17 +17,5 @@ public class UserListItemDTO implements Serializable {
         this.name = user.getName();
         this.email = user.getEmail();
         this.role = user.getRole();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Role getRole() {
-        return role;
     }
 }

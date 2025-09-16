@@ -3,31 +3,18 @@ package br.com.alura.projeto.util;
 import org.springframework.util.Assert;
 import org.springframework.validation.FieldError;
 
-public class ErrorItemDTO {
-
-    private final String field;
-    private final String message;
+public record ErrorItemDTO(String field, String message) {
 
     public ErrorItemDTO(FieldError fieldError) {
         this(fieldError.getField(), fieldError.getDefaultMessage());
     }
 
-    public ErrorItemDTO(String field, String message) {
-        Assert.notNull(field, "Field description must not be null");
-        Assert.isTrue(!field.isEmpty(), "Field description must not be empty");
+    public ErrorItemDTO {
+        Assert.notNull(field, "Descrição do campo não deve ser nula");
+        Assert.isTrue(!field.isEmpty(), "Descrição do campo não deve estar vazia");
 
-        Assert.notNull(message, "Message description must not be null");
-        Assert.isTrue(!message.isEmpty(), "Message description must not be empty");
+        Assert.notNull(message, "Descrição da mensagem não deve ser nula");
+        Assert.isTrue(!message.isEmpty(), "Descrição da mensagem não deve estar vazia");
 
-        this.field = field;
-        this.message = message;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getMessage() {
-        return message;
     }
 }
